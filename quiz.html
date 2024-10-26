@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Diagnóstico de Matemáticas - ADE</title>
+    <!-- MathJax CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async></script>
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+            tex2jax: {
+                inlineMath: [['\\(','\\)']],
+                displayMath: [['\\[','\\]']],
+                processEscapes: true,
+                processEnvironments: true
+            },
+            "HTML-CSS": { 
+                linebreaks: { automatic: true } 
+            },
+            SVG: { 
+                linebreaks: { automatic: true } 
+            }
+        });
+    </script>
+    <style>
+        :root {
+            --primary: #4F46E5;
+            --secondary: #374151;
+            --danger: #DC2626;
+            --success: #16A34A;
+            --warning: #CA8A04;
+            --background: #F3F4F6;
+            --white: #FFFFFF;
+            --light-gray: #E5E7EB;
+            --blue-light: #93C5FD;
+            --red-light: #FCA5A5;
+            --green-light: #6EE7B7;
+            --yellow-light: #FCD34D;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--background);
+            color: var(--secondary);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            background-color: var(--white);
+            padding: 2.5rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            width: 100%;
+        }
+
+        .intro {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        h1 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-size: 2rem;
+        }
+
+        p {
+            margin-bottom: 0.75rem;
+            line-height: 1.5;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            background-color: var(--primary);
+            color: var(--white);
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            margin-top: 1rem;
+        }
+
+        .btn:hover {
+            background-color: #4338CA;
+            transform: translateY(-2px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .timer-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .timer {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--secondary);
+            min-width: 80px;
+            text-align: center;
+        }
+
+        .progress-bar {
+            flex-grow: 1;
+            height: 10px;
+            background-color: var(--light-gray);
+            border-radius: 5px;
+            margin: 0 1rem;
+            overflow: hidden;
+        }
+
+        .progress {
+            height: 100%;
+            background-color: var(--primary);
+            width: 100%;
+            transition: width 1s linear, background-color 0.3s ease;
+        }
+
+        .question-container {
+            margin-bottom: 2rem;
+        }
+
+        .question {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background-color: #F9FAFB;
+            border-left: 4px solid var(--primary);
+            border-radius: 6px;
+        }
+
+        .options {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .option {
+            padding: 1rem;
+            border: 2px solid var(--light-gray);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+            background-color: var(--white);
+        }
+
+        .option:hover {
+            border-color: var(--primary);
+            background-color: var(--blue-light);
+        }
+
+        .option.selected {
+            border-color: var(--primary);
+            background-color: var(--blue-light);
+        }
+
+        .results {
+            text-align: center;
+            display: none;
+        }
+
+        .results h2 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-size: 1.75rem;
+        }
+
+        .score {
+            font-size: 2rem;
+            font-weight: bold;
+            margin: 1rem 0;
+            color: var(--primary);
+        }
+
+        .feedback {
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            font-size: 1.1rem;
+        }
+
+        .feedback.success {
+            background-color: var(--green-light);
+            color: var(--success);
+        }
+
+        .feedback.warning {
+            background-color: var(--yellow-light);
+            color: var(--warning);
+        }
+
+        .feedback.danger {
+            background-color: var(--red-light);
+            color: var(--danger);
+        }
+
+        @media (max-width: 640px) {
+            .container {
+                padding: 1.5rem;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .timer {
+                font-size: 1.3rem;
+            }
+
+            .question {
+                font-size: 1rem;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="intro" id="intro">
+            <h1>Quiz Diagnóstico de Matemáticas</h1>
+            <p>¡Bienvenido, Oscar! Este quiz evaluará tus conocimientos en matemáticas fundamentales para <strong>Administración y Dirección de Empresas</strong>.</p>
+            <p>Tienes <strong>5 minutos</strong> para completar <strong>8 preguntas</strong>. ¡Mucha suerte!</p>
+            <button class="btn" id="startBtn">Comenzar Quiz</button>
+        </div>
+
+        <div id="quiz" style="display: none;">
+            <div class="timer-container">
+                <div class="timer" id="timer">05:00</div>
+                <div class="progress-bar">
+                    <div class="progress" id="progress"></div>
+                </div>
+            </div>
+
+            <div class="question-container">
+                <div class="question" id="question"></div>
+                <div class="options" id="options"></div>
+            </div>
+        </div>
+
+        <div class="results" id="results">
+            <h2>Resultados del Quiz</h2>
+            <div class="score">
+                Puntuación: <span id="score">0</span>/8
+            </div>
+            <div class="feedback" id="feedback"></div>
+            <button class="btn" onclick="location.reload()">Intentar de nuevo</button>
+        </div>
+    </div>
+
+    <script>
+        // Función para mezclar un array (Fisher-Yates Shuffle)
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        const questions = [
+            {
+                question: "En una empresa, el costo total está dado por la función \\(CT = 100 + 20q\\), donde \\(q\\) es la cantidad producida. ¿Cuál es el costo fijo?",
+                options: [
+                    "\\(100\\) unidades monetarias",
+                    "\\(20\\) unidades monetarias",
+                    "\\(20q\\) unidades monetarias",
+                    "No se puede determinar"
+                ],
+                correct: 0,
+                explanation: "El término constante \\(100\\) representa el costo fijo."
+            },
+            {
+                question: "Si la demanda mensual de un producto está dada por la función \\[P = 1000 - 2Q\\] donde \\(P\\) es el precio y \\(Q\\) la cantidad, ¿cuál es el precio cuando \\(Q = 200\\) unidades?",
+                options: [
+                    "\\(600\\)",
+                    "\\(800\\)",
+                    "\\(400\\)",
+                    "\\(700\\)"
+                ],
+                correct: 0,
+                explanation: "Sustituyendo \\(Q = 200\\) en la ecuación: \\(P = 1000 - 2(200) = 1000 - 400 = 600\\)"
+            },
+            {
+                question: "La tasa de interés compuesto se calcula mediante la fórmula: \\[A = P(1 + r)^n\\] Si \\(P = \\$1000\\), \\(r = 5\\%\\) anual y \\(n = 2\\) años, ¿cuál será el monto final?",
+                options: [
+                    "\\(\\$1,102.50\\)",
+                    "\\(\\$1,100.00\\)",
+                    "\\(\\$1,105.00\\)",
+                    "\\(\\$1,107.25\\)"
+                ],
+                correct: 0,
+                explanation: "Calculando: \\(A = 1000(1 + 0.05)^2 = 1000(1.1025) = 1102.50\\)"
+            },
+            {
+                question: "En un estudio de mercado, la media de edad es \\(\\mu = 35\\) años con desviación estándar \\(\\sigma = 5\\) años. Si la distribución es normal, ¿qué porcentaje de consumidores tiene entre \\(\\mu - \\sigma\\) y \\(\\mu + \\sigma\\)?",
+                options: [
+                    "\\(68\\%\\)",
+                    "\\(95\\%\\)",
+                    "\\(99\\%\\)",
+                    "\\(50\\%\\)"
+                ],
+                correct: 0,
+                explanation: "En una distribución normal, aproximadamente el 68% de los datos se encuentran dentro de una desviación estándar de la media."
+            },
+            {
+                question: "Si el margen de beneficio es del \\(25\\%\\) sobre el costo \\(C\\), y \\(C = 80€\\), el precio de venta \\(P\\) es:",
+                options: [
+                    "\\(100€\\)",
+                    "\\(105€\\)",
+                    "\\(95€\\)",
+                    "\\(110€\\)"
+                ],
+                correct: 0,
+                explanation: "El margen de beneficio es \\(0.25 \\times 80 = 20\\). Por lo tanto, \\(P = C + margen = 80 + 20 = 100€\\)"
+            },
+            {
+                question: "En un análisis de regresión lineal, el coeficiente de correlación \\(r = 0.9\\) indica que:",
+                options: [
+                    "Existe una fuerte correlación positiva",
+                    "Existe una débil correlación positiva",
+                    "Existe una fuerte correlación negativa",
+                    "No existe correlación"
+                ],
+                correct: 0,
+                explanation: "Un valor de \\(r = 0.9\\) indica una fuerte correlación positiva entre las variables."
+            },
+            {
+                question: "¿Cuál es la derivada de la función de ingreso \\[R(q) = 100q - 2q^2\\] que representa el ingreso en función de la cantidad \\(q\\)?",
+                options: [
+                    "\\(100 - 4q\\)",
+                    "\\(100 - 2q\\)",
+                    "\\(-4q\\)",
+                    "\\(100\\)"
+                ],
+                correct: 0,
+                explanation: "La derivada de \\(R(q)\\) respecto a \\(q\\) es \\(R'(q) = 100 - 4q\\)."
+            },
+            {
+                question: "En una matriz \\(2 \\times 2\\), si el determinante es cero, esto significa que:",
+                options: [
+                    "El sistema de ecuaciones no tiene solución única",
+                    "El sistema siempre tiene solución única",
+                    "La matriz es invertible",
+                    "La matriz es simétrica"
+                ],
+                correct: 0, // Cambiado para tener solo una respuesta correcta
+                explanation: "Un determinante cero indica que la matriz no es invertible y el sistema no tiene una solución única."
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let timeLeft = 300; // 5 minutos en segundos
+        let timer;
+        let answers = new Array(questions.length).fill(null);
+
+        // Mezclar opciones de cada pregunta al inicio
+        questions.forEach((question) => {
+            const correctOption = question.options[question.correct];
+            question.options = shuffleArray(question.options);
+            question.correct = question.options.indexOf(correctOption);
+        });
+
+        document.getElementById('startBtn').addEventListener('click', startQuiz);
+
+        function startQuiz() {
+            document.getElementById('intro').style.display = 'none';
+            document.getElementById('quiz').style.display = 'block';
+            showQuestion();
+            startTimer();
+        }
+
+        function showQuestion() {
+            const question = questions[currentQuestion];
+            document.getElementById('question').innerHTML = `Pregunta ${currentQuestion + 1}/8: ${question.question}`;
+            
+            const optionsHtml = question.options.map((option, index) => `
+                <div class="option ${answers[currentQuestion] === index ? 'selected' : ''}" 
+                     onclick="selectOption(${index})">
+                    ${option}
+                </div>
+            `).join('');
+            
+            document.getElementById('options').innerHTML = optionsHtml;
+            
+            // Renderizar matemáticas después de actualizar el contenido
+            if (window.MathJax) {
+                MathJax.Hub.Queue(["Typeset", MathJax.Hub, "question"]);
+                MathJax.Hub.Queue(["Typeset", MathJax.Hub, "options"]);
+            }
+        }
+
+        function selectOption(index) {
+            answers[currentQuestion] = index;
+            const options = document.querySelectorAll('.option');
+            options.forEach((option, idx) => {
+                if (idx === index) {
+                    option.classList.add('selected');
+                } else {
+                    option.classList.remove('selected');
+                }
+            });
+
+            setTimeout(() => {
+                if (currentQuestion < questions.length - 1) {
+                    currentQuestion++;
+                    showQuestion();
+                } else {
+                    endQuiz();
+                }
+            }, 300);
+        }
+
+        function startTimer() {
+            timer = setInterval(() => {
+                timeLeft--;
+                updateTimer();
+                updateProgress();
+                
+                if (timeLeft <= 0) {
+                    endQuiz();
+                }
+            }, 1000);
+        }
+
+        function updateTimer() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            document.getElementById('timer').textContent = 
+                `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            
+            if (timeLeft <= 60) {
+                document.getElementById('timer').style.color = 'var(--danger)';
+            } else {
+                document.getElementById('timer').style.color = 'var(--secondary)';
+            }
+        }
+
+        function updateProgress() {
+            const percent = (timeLeft / 300) * 100;
+            document.getElementById('progress').style.width = `${percent}%`;
+            
+            if (timeLeft <= 60) {
+                document.getElementById('progress').style.backgroundColor = 'var(--danger)';
+            } else {
+                document.getElementById('progress').style.backgroundColor = 'var(--primary)';
+            }
+        }
+
+        function calculateScore() {
+            score = answers.reduce((acc, answer, index) => {
+                return acc + (answer === questions[index].correct ? 1 : 0);
+            }, 0);
+        }
+
+        function getFeedback() {
+            const percentage = (score / questions.length) * 100;
+            let feedback = '';
+            let feedbackClass = '';
+
+            if (percentage >= 75) {
+                feedback = "¡Excelente trabajo! Dominas los conceptos matemáticos clave para ADE. Estás bien preparado para los desafíos de tu carrera.";
+                feedbackClass = 'success';
+            } else if (percentage >= 50) {
+                feedback = "Buen desempeño. Has demostrado conocimiento en varios conceptos importantes, pero hay algunas áreas que podríamos reforzar para mejorar tu comprensión.";
+                feedbackClass = 'warning';
+            } else {
+                feedback = "Identificamos algunas áreas que necesitan refuerzo. No te preocupes, estoy aquí para ayudarte a fortalecer estos conceptos fundamentales para tu éxito en ADE.";
+                feedbackClass = 'danger';
+            }
+
+            return { text: feedback, class: feedbackClass };
+        }
+
+        function endQuiz() {
+            clearInterval(timer);
+            calculateScore();
+            
+            document.getElementById('quiz').style.display = 'none';
+            document.getElementById('results').style.display = 'block';
+            document.getElementById('score').textContent = score;
+            
+            const feedback = getFeedback();
+            const feedbackElement = document.getElementById('feedback');
+            feedbackElement.textContent = feedback.text;
+            feedbackElement.classList.add(feedback.class);
+        }
+
+        // Inicializar MathJax cuando el documento esté listo
+        document.addEventListener('DOMContentLoaded', function() {
+            if (window.MathJax) {
+                MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+            }
+        });
+    </script>
+</body>
+</html>
